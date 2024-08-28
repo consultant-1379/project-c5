@@ -1,0 +1,147 @@
+{% extends 'partials/base_template.html' %}
+
+{% block content %}
+
+<head>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src = "https://code.highcharts.com/highcharts.js"></script>
+    <meta charset="UTF-8">
+</head>
+
+    {% if user %}
+      <div id = "container" style = "width: 60%; height: 60vh; margin: 5% auto"></div>
+      <script language = "JavaScript">
+         $(document).ready(function() {
+            var chart = {
+               type: 'area',
+               inverted: true
+            };
+            var title = {
+               text: 'Cloud Native Maturity Matrix Results'
+            };
+            var subtitle = {
+               style: {
+                  position: 'absolute',
+                  right: '0px',
+                  bottom: '10px'
+               }
+            };
+            var legend = {
+               layout: 'vertical',
+               align: 'left',
+               verticalAlign: 'top',
+               x: -150,
+               y: 100,
+               floating: true,
+               borderWidth: 2,
+
+               backgroundColor: (
+                  Highcharts.theme && Highcharts.theme.legendBackgroundColor) ||
+                     '#9f9f9f'
+            };
+            var xAxis = {
+                endOnTick: true,
+               categories: [
+                        {% for key, value in user['scores'].items() %}
+                        '{{ key }}',
+                        {% endfor %}
+                ]
+            };
+            var yAxis = {
+               title: {
+                  text: ''
+               },
+                min: 0,
+                startOnTIck: false,
+                tickInterval: 0.5,
+                floor: 0,
+                endOnTick: true,
+               labels: {
+                  formatter: function () {
+                    var labels = [
+                        "NO PROCESS", "WATERFALL", "AGILE", "CLOUD NATIVE", "NEXT"
+                    ];
+
+                    return labels[this.value];
+                  }
+               },
+            };
+            var plotOptions = {
+                series: {
+                    dashStyle: 'ShortDash',
+                },
+                area: {
+                  fillOpacity: 0.25
+               }
+            };
+            var credits = {
+               enabled: false
+            };
+            var series = [
+                {
+                    name: 'Next Generation',
+                    data: [4,4,4,4,4,4,4,4,4],
+                    color: "rgba(255,255,255,0)"
+                },
+                {
+                    name: 'Cloud Native',
+                    data: [3,3,3,3,3,3,3,3,3],
+                    color: "#f0a3c9"
+                },
+               {
+                  name: '{{ user['companyName'] }}',
+                  data: [
+                      {% for key, value in user['scores'].items() %}
+                        {{ value - 1 }},
+                      {% endfor %}
+                  ],
+                  color: "#5edfff"
+               }
+
+            ];
+
+            var json = {};
+            json.chart = chart;
+            json.title = title;
+            json.subtitle = subtitle;
+            json.xAxis = xAxis;
+            json.yAxis = yAxis;
+            json.legend = legend;
+            json.plotOptions = plotOptions;
+            json.credits = credits;
+            json.series = series;
+            $('#container').highcharts(json, function(chart) {
+
+                var stages = [["Individualist","Predictive", "Iterative", "Collaborative", "Experimental" ],
+                    ["Arbitrary", "Long-term plan", "Feature driven", "Data driven", "All driven"],
+                    ["No organisation,<br>single contributor", "Hierarchy", "Cross-functional<br>teams", "DevOps / SRE", "Internal supply<br>chains"],
+                    ["Random", "Waterfall", "Agile<br>(Scrum/Kanban)", "Design Thinking +<br>Agile + Lean ", "Distributed<br> self-organized"],
+                    ["Emerging from<br>trial and error", "Tightly coupled<br>monolith", "Client server", "Microservices", "Functions"],
+                    ["Respond to<br>users complaints", "Ad-hoc<br>monitoring", "Alerting", "Full observability &<br>self-healing", "Preventive ML,<br>AI"],
+                    ["Irregular<br>releases", "Periodic<br>releases", "Continuous<br>Integration", "Continuous<br>Delivery", "Continuous<br>Deployment"],
+                    ["Manual", "Scripted", "Config-management<br>(Puppet/Chef/Ansible)", "Orchestration<br>(Kubernetes)", "Serverless"],
+                    ["Single server", "Multiple servers", "VMs (pets)", "Containers/<br>hybrid cloud (cattle)", "Edge computing"]
+                ];
+
+                var row = 0, col = 0
+                stages.forEach( list => {
+                    list.forEach(word => {
+                        let yVal = 330 - row*52.5;
+                        chart.renderer.text("○  "+word, chart.xAxis[0].toPixels((2.5+4*col), false), chart.yAxis[0].toPixels(1, false)-yVal)
+                        .attr({
+                            zIndex: 2
+                        })
+                        .css({
+                            fontSize: '10px'
+                      })
+                  .add();
+                        col+=1;
+                    });
+                    col=0
+                    row+=1;
+                })
+            });
+         });
+      </script>
+    {% endif %}
+{% endblock %}

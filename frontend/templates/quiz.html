@@ -1,0 +1,191 @@
+{% extends 'partials/base_template.html' %}
+
+{% block content %}
+<head>
+    <title>Quiz</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quiz.css') }}">
+</head>
+
+<div class="container">
+    <div class="center">
+
+        <div class="category">
+        </div>
+        <hr>
+
+        <div class="question"></div>
+        <br />
+
+        <div class="answers">
+        </div>
+
+        <div class="btn btn-primary nextBtn">
+            Next
+        </div>
+    </div>
+</div>
+<script>
+
+    let data = {{data|tojson}}
+    let firstLoad = true
+
+    function show(el, content) {
+        if (firstLoad) {
+            el.html(content)
+            return;
+        }
+
+        el.animate({'opacity': 1}, 0, function () {
+            $(this).html();
+        }).animate({'opacity': 0}, 500);
+        el.animate({'opacity': 0}, 0, function () {
+            $(this).html(content);
+        }).animate({'opacity': 1}, 500);
+    }
+
+    function loadQuestion(qNo, qType) {
+        let category = $(".category")
+        let answers = $(".answers")
+        let question = $(".question")
+
+        show(category, data[qNo]["category"].charAt(0).toUpperCase() + data[qNo]["category"].slice(1).toLowerCase())
+        show(question, data[qNo][qType])
+
+
+        let html = '<input id="category" type="hidden" value="' + data[qNo]["category"] + '"/>'
+
+        if (qType == "primary") {
+            html += '<div class="answer">' +
+                '<span>Yes</span>' +
+                '<input id="yes" name="resp" type="radio" value="yes">' +
+                '<br />' +
+            '</div>'
+            html += '<div class="answer">' +
+                '<span>No</span>' +
+                '<input id="no" name="resp" type="radio" value="no">' +
+                '<br />' +
+            '</div>'
+
+        } else {
+            for (let ans in data[qNo]["answers"]) {
+                let ob = data[qNo]["answers"][ans]
+                html += '<div class="answer">' +
+                    '<span>' + ob.answer + '</span>' +
+                    '<input class="answerVal" type="checkbox" value="' + ob.value + '">' +
+                    '<br />' +
+                '</div>'
+            }
+        }
+
+
+        show(answers, html)
+        firstLoad = false
+    }
+
+    function getSelectedValue() {
+        let sum = [];
+        $(".answerVal").each(function() {
+            if ($(this).is(":checked")) {
+                sum.push(parseInt($(this).attr("value")))
+            }
+        })
+
+        if (sum.length == 2 && sum[0] == 3 && sum[1] == 3) {
+            return 3;
+        } else if (sum.length == 2 && sum[0] == 2 && sum[1] == 2) {
+            return 2;
+        } else if (sum.length == 0) {
+            return 0;
+        } else {
+            return 2.5;
+        }
+    }
+
+    $(document).ready(function() {
+        let qNo = Cookies.get("questionNo") === undefined || firstLoad === true ? 0 : Cookies.get("questionNo")
+        let qType = Cookies.get("questionType") === undefined ? "primary" : Cookies.get("questionType")
+        let lastQ = (parseInt(qNo)+1) == data.length;
+
+        //Setup question
+        let btnText = lastQ ? "Submit" : "Next"
+        $(".nextBtn").html(btnText)
+        loadQuestion(qNo, qType)
+
+        $(".nextBtn").click(function() {
+
+            if (qType === "primary") {
+                if ($("#yes").is(":checked")) {
+                    qNo++;
+                    Cookies.set("questionNo", qNo)
+
+                    let category = $("#category").attr("value")
+                    Cookies.set(category, 3)
+                } else {
+                    Cookies.set("qType", "secondary")
+                    qType = "secondary"
+                }
+            } else {
+                qType = "primary"
+                qNo++
+                Cookies.set("questionNo", qNo)
+
+                let score = getSelectedValue()
+                let category = $("#category").attr("value")
+                Cookies.set(category, score)
+
+                if(!lastQ) {
+                    loadQuestion(qNo, qType);
+                    return
+                }
+            }
+
+            if (lastQ && qType === "primary" ) {
+
+                send = {
+                    "firstName": Cookies.get("firstName"),
+                    "lastName": Cookies.get("lastName"),
+                    "companyName": Cookies.get("company"),
+                    "scores": {}
+                }
+
+                data.forEach(function (e) {
+                    send.scores[e.category] = Cookies.get(e.category)
+                })
+
+                request = $.ajax({
+                    url: "http://localhost:9090/api/user",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(send)
+                })
+
+                Cookies.remove("questionNo")
+                Cookies.remove("questionType")
+
+                data.forEach(function (e) {
+                    Cookies.remove(e.category)
+                })
+
+                request.done(function (resp, textStatus, jqXHR) {
+                    window.location.href = "/results/" + resp.id
+                })
+                request.fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error");
+                })
+
+                return;
+            }
+
+            loadQuestion(qNo, qType)
+
+            if ((parseInt(qNo)+1) == data.length) {
+                lastQ = true;
+                $(".nextBtn").html("Submit")
+            }
+
+        });
+    });
+
+</script>
+{% endblock %}

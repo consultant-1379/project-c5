@@ -1,0 +1,50 @@
+.table {
+    margin: 20px 50px;
+    width: 90%;
+}
+
+td, th {
+    width: 45%;
+}
+
+th {
+    text-align: center;
+}
+
+.column {
+    overflow-y: scroll;
+    height: 75vh;
+    width: 90%;
+}
+
+.question-card {
+    padding: 20px;
+    margin: 80px;
+}
+
+.user-card {
+    padding: 20px;
+    margin: 80px
+}
+
+a {
+    margin: 10px;
+}
+
+.answer {
+   width: 70%;
+}
+
+.value {
+    width: 30%;
+    text-align: center;
+    vertical-align: top;
+}
+
+input[type=text] {
+    right: 0;
+}
+
+.newQ {
+    margin: 50px auto 0 150px;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cloud Native Maturity Matrix</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/cnmm.min.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.mobile.icons.min.css') }}"/>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cnmm.css') }}"/>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css"/>
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"
+integrity="sha512-Meww2sXqNHxI1+5Dyh/9KAtvI9RZSA4c1K2k5iL02oiPO/RH3Q30L3M1albtqMg50u4gRTYdV4EXOQqXEI336A=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+
+	$(document).ready(function(){
+	$("body").css("display", "none");
+
+    $("body").fadeIn(1000);
+	   $("#storeName").click(function(){
+
+		var nameVal=document.getElementById('nameTF').value;
+		Cookies.set("firstName", nameVal);
+	   });
+	});
+
+	$(document).ready(function(){
+	   $("#storeLastName").click(function(){
+		var lastNameVal=document.getElementById('lastNameTF').value;
+		Cookies.set("lastName", lastNameVal);
+	   });
+	});
+
+	$(document).ready(function(){
+	   $("#storeCompany").click(function(){
+		var companyVal=document.getElementById('companyTF').value;
+		Cookies.set("company", companyVal);
+		window.location.href = "/quiz";
+	   });
+	});
+
+
+</script>
+
+
+</head>
+
+<body>
+
+	<div data-role="page" id="Landing" data-theme="a">
+		<div data-role="header">
+			<div data-role= "navbar">
+			 <ul>
+			 <li><a href="#Landing"><img src="static/transparentLogoBrandSafeColourFixed.png" alt="Logo3WasEnough" width="50" height="65" class="center" ></a></li>
+			 </ul>
+			</div>
+		</div>
+
+		<div data-role="main" class="ui-content">
+			<h2>What is Cloud Native Maturity?</h2>
+			<ul>
+				<li><b>Cloud native maturity</b> is a measure of just how ready to go cloud native your organisation is!</li>
+			</ul>
+			<h2>What does cloud native mean to me?</h2>
+			<ul>
+				<li>Cloud Native computing is a new way of developing software that makes use of cloud computing!</li>
+				<li>It uses technologies like containers, microservices and immutable infrastructure</li>
+				<li>Being Cloud native means you can build and run scalable applications in modern, dynamic environments</li>
+			</ul>
+			<h2>What is this tool for?</h2>
+			<ul>
+				<li>This tool is a quiz that helps you assess your Cloud Native Maturity!</li>
+				<li>Its easy <b>(and expensive)</b> for a company to get lost trying to figure out what needs to change</li>
+				<li>Take our quiz to get instant feedback and see how ready to go cloud native you are</li>
+			</ul>
+			<div data-role="collapsible">
+			<h1>Take the quiz</h1>
+			<label>Firstly, We need your first name:</label>
+				<textarea name="n" id="nameTF" width="300" height="300" ></textarea>
+				<a href="#Landing2" ><input type="submit" name="storeName" id="storeName" value="Submit"/></a>
+			</div>
+			</div>
+		<div data-role="footer" >
+			<h2>&copy; 3 was enough </h2>
+		</div>
+	</div>
+
+
+	<div data-role="page" id="Landing2" data-theme="a">
+		<div data-role="header">
+			<div data-role= "navbar">
+			 <ul>
+			 <li><a href="#Landing"><img src="static/transparentLogoBrandSafeColourFixed.png" alt="Logo3WasEnough" width="50" height="65" class="center" ></a></li>
+			 </ul>
+			</div>
+		</div>
+
+		<div data-role="main" class="ui-content">
+		<h1>Quiz Signup</h1>
+		<label>Next, we need your surname:</label>
+			<textarea name="n" id="lastNameTF" ></textarea>
+			<a href="#Landing3" class="transition" ><input type="submit" name="storeLastName" id="storeLastName" value="Submit"/></a>
+
+
+		</div>
+		<div data-role="footer">
+			<h2>&copy; 3 was enough</h2>
+		</div>
+	</div>
+
+	<div data-role="page" id="Landing3" data-theme="a">
+		<div data-role="header">
+			<h1>Landing page header</h1>
+			<div data-role= "navbar">
+			 <ul>
+			 <li><a href="#Landing"><img src="static/transparentLogoBrandSafeColourFixed.png" alt="Logo3WasEnough" width="50" height="65" class="center" ></a></li>
+			 </ul>
+			</div>
+		</div>
+
+		<div data-role="main" class="ui-content">
+		<h1>Quiz Signup</h1>
+		<label>Finally, please tell us the name of your company:</label>
+			<textarea name="n" id="companyTF" ></textarea>
+			<input type="submit" name="storeCompany" id="storeCompany" value="Start Quiz"/>
+		</div>
+		<div data-role="footer">
+			<h2>&copy; 3 was enough</h2>
+		</div>
+	</div>
+
+</body>
+</html>

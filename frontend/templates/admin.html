@@ -1,0 +1,282 @@
+{% extends 'partials/base_template.html' %}
+
+{% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+    </head>
+
+    <script>
+
+    function editButton(id) {
+        var newQuestion = {
+            'id': id,
+            'primary': document.getElementById(id + "-primary-text").value,
+            'secondary': document.getElementById(id + "-secondary-text").value,
+            'number': 0,
+            'category': document.getElementById(id + "-category-text").value,
+            'answers': [
+                {'answer': document.getElementById(id + "-ans1-text").value, 'value': parseFloat(document.getElementById(id + "-val1-text").value)},
+                {'answer': document.getElementById(id + "-ans2-text").value, 'value': parseFloat(document.getElementById(id + "-val2-text").value)},
+                {'answer': document.getElementById(id + "-ans3-text").value, 'value': parseFloat(document.getElementById(id + "-val3-text").value)},
+                {'answer': document.getElementById(id + "-ans3-text").value, 'value': parseFloat(document.getElementById(id + "-val3-text").value)}
+            ]
+        };
+
+        var request = $.ajax({
+            url: "http://localhost:9090/api/question",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(newQuestion)
+        });
+        request.done(function (resp, textStatus, jqXHR) {
+            alert("Question Updated.")
+            window.location.href = "/admin"
+        })
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            console.log("Error: "+errorThrown );
+        })
+    }
+
+    $(document).ready(function(){
+
+            if(window.location.pathname !== "/admin") {
+                window.location.href = "/admin";
+            }
+           var questions = document.getElementsByName("question");
+           questions.forEach( function(question) {
+               var deleteBtn = question.children[1].children[0];
+               $('#'+deleteBtn.id).click(function() {
+                   window.location.href = "/admin/" + deleteBtn.id.split('-')[0];
+                });
+           });
+
+           var users = document.getElementsByName("user");
+           users.forEach( function(user) {
+               var deleteBtn = user.children[1].children[0].children[0].children[0].children[0].children[0];
+               $('#'+deleteBtn.id).click(function() {
+                   window.location.href = "/admin/user/" + deleteBtn.id.split('-')[0];
+                });
+           });
+
+           $("#saveQuestion").click( function() {
+                var newQuestion = {
+                    'primary': document.getElementById("primary-text").value,
+                    'secondary': document.getElementById("secondary-text").value,
+                    'number': 0,
+                    'category': document.getElementById("category-text").value,
+                    'answers': [
+                        {'answer': document.getElementById("ans1-text").value, 'value': parseFloat(document.getElementById("val1-text").value)},
+                        {'answer': document.getElementById("ans2-text").value, 'value': parseFloat(document.getElementById("val2-text").value)},
+                        {'answer': document.getElementById("ans3-text").value, 'value': parseFloat(document.getElementById("val3-text").value)},
+                        {'answer': document.getElementById("ans3-text").value, 'value': parseFloat(document.getElementById("val3-text").value)}
+                    ]
+                };
+
+                var request = $.ajax({
+                    url: "http://localhost:9090/api/question",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(newQuestion)
+                });
+                request.done(function (resp, textStatus, jqXHR) {
+                    window.location.href = "/admin"
+                })
+                request.fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error: "+errorThrown );
+                })
+           });
+        });
+    </script>
+<div>
+    <button type="button" class="newQ btn btn-primary" data-bs-toggle="modal" data-bs-target="#newQuestionModal">
+      New Question
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="newQuestionModal" tabindex="-1" aria-labelledby="newQuestionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newQuestionModalLabel">New Question</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <table class="table table-striped" style="margin: 0px">
+                  <tr>
+                    <th id="modal-category" class="card-title">Category:</th>
+                    <td><input id="category-text" type="text"/></td>
+                  </tr>
+                  <tr>
+                    <th id="modal-primary" class="card-subtitle">Primary:</th>
+                    <td><input id="primary-text" type="text"/></td>
+                  </tr>
+                  <tr>
+                    <th id="modal-secondary" class="card-subtitle">Secondary:</th>
+                    <td><input id="secondary-text" type="text"/></td>
+                  </tr>
+                  <tr>
+                    <td id="modal-answer1" class="card-text answer"><b>Answer 1:</b> <textarea id="ans1-text"></textarea></td>
+                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="val1-text" type="number"></td>
+                  </tr>
+                  <tr>
+                    <td id="modal-answer2" class="card-text answer"><b>Answer 2:</b> <textarea id="ans2-text" ></textarea></td>
+                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="val2-text" type="number"></td>
+                  </tr>
+                  <tr>
+                    <td id="modal-answer3" class="card-text answer"><b>Answer 3:</b> <textarea id="ans3-text" ></textarea></td>
+                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="val3-text" type="number"></td>
+                  </tr>
+                  <tr>
+                    <td id="modal-answer4" class="card-text answer"><b>Answer 4:</b> <textarea id="ans4-text" ></textarea></td>
+                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="ans4-text" type="number"></td>
+                  </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button  id="saveQuestion" type="button" class="btn btn-primary">Save Question</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Questions</th>
+                <th scope="col">Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                   {% if data['questions'] %}
+                       <div class="column">
+                            {% for question in data['questions'] %}
+                                <div id="{{ question['id'] }}" class="question-card card border-secondary shadow" name="question">
+                                    <div class="card-body">
+                                        <h5 id="{{ question['id'] }}-category" class="card-title">Category: {{ question['category'] }}</h5>
+                                        <h6 id="{{ question['id'] }}-primary" class="card-subtitle">Primary: {{ question['primary'] }}</h6>
+                                        <br/>
+                                        <h6 id="{{ question['id'] }}-secondary" class="card-subtitle">Secondary: {{ question['secondary'] }}</h6>
+                                        <br/>
+                                        <table class="table table-striped" style="margin: 0px">
+                                            <tr>
+                                                <td id="{{ question['id'] }}-answer1" class="card-text answer"><b>Answer 1:</b> {{ question['answers'][0]['answer'] }}</td>
+                                                <td id="{{ question['id'] }}-answer-val" class="card-text value"><b>Value:</b> {{ question['answers'][0]['value'] }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="{{ question['id'] }}-answer2" class="card-text answer"><b>Answer 2:</b> {{ question['answers'][1]['answer'] }}</td>
+                                                <td id="{{ question['id'] }}-answer-val" class="card-text value"><b>Value:</b> {{ question['answers'][1]['value'] }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="{{ question['id'] }}-answer3" class="card-text answer"><b>Answer 3:</b> {{ question['answers'][2]['answer'] }}</td>
+                                                <td id="{{ question['id'] }}-answer-val" class="card-text value"><b>Value:</b> {{ question['answers'][2]['value'] }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="{{ question['id'] }}-answer4" class="card-text answer"><b>Answer 4:</b> {{ question['answers'][3]['answer'] }}</td>
+                                                <td id="{{ question['id'] }}-answer-val" class="card-text value"><b>Value:</b> {{ question['answers'][3]['value'] }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="card-footer" style="text-align: center">
+                                        <input id="{{ question['id'] }}-delete" class="btn btn-outline-danger" type="submit" value="Delete"/>
+                                        <input id="{{ question['id'] }}-edit" name="edit-btn" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editQuestionModal-{{ question['id'] }}" type="submit" value="Edit"/>
+                                    </div>
+                                     <div class="modal fade" id="editQuestionModal-{{ question['id'] }}" tabindex="-1" aria-labelledby="newQuestionModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="newQuestionModalLabel">New Question</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <table class="table table-striped" style="margin: 0px">
+                                                  <tr>
+                                                    <th id="modal-category" class="card-title">Category:</th>
+                                                    <td><input id="{{ question['id'] }}-category-text" type="text" value="{{ question['category'] }}"/></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <th id="modal-primary" class="card-subtitle">Primary:</th>
+                                                    <td><input id="{{ question['id'] }}-primary-text" type="text" value="{{ question['primary'] }}"/></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <th id="modal-secondary" class="card-subtitle">Secondary:</th>
+                                                    <td><input id="{{ question['id'] }}-secondary-text" type="text" value="{{ question['secondary'] }}"/></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td id="modal-answer1" class="card-text answer"><b>Answer 1:</b> <textarea id="{{ question['id'] }}-ans1-text">{{ question['answers'][0]['answer'] }}</textarea></td>
+                                                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="{{ question['id'] }}-val1-text" type="number" value="{{ question['answers'][0]['value'] }}"></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td id="modal-answer2" class="card-text answer"><b>Answer 2:</b> <textarea id="{{ question['id'] }}-ans2-text" >{{ question['answers'][1]['answer'] }}</textarea></td>
+                                                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="{{ question['id'] }}-val2-text" type="number" value="{{ question['answers'][1]['value'] }}"></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td id="modal-answer3" class="card-text answer"><b>Answer 3:</b> <textarea id="{{ question['id'] }}-ans3-text" >{{ question['answers'][2]['answer'] }}</textarea></td>
+                                                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="{{ question['id'] }}-val3-text" type="number" value="{{ question['answers'][2]['value'] }}"></td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td id="modal-answer4" class="card-text answer"><b>Answer 4:</b> <textarea id="{{ question['id'] }}-ans4-text" >{{ question['answers'][3]['answer'] }}</textarea></td>
+                                                    <td id="modal-answer-val" class="card-text value"><b>Value:</b> <input id="{{ question['id'] }}-ans4-text" type="number" value="{{ question['answers'][3]['value'] }}"></td>
+                                                  </tr>
+                                            </table>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button  id="editButton-{{ question['id'] }}" name="editButton" type="button" onclick="editButton('{{ question['id'] }}')" class="btn btn-primary">Save Question</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                       </div>
+                   {% else %}
+                        <div class="column">
+                            <h3>No Questions</h3>
+                       </div>
+                   {% endif %}
+                </td>
+
+                <td>
+                   {% if data['users'] %}
+                       <div class="column">
+                            {% for user in data['users'] %}
+                                <div class="user-card card border-secondary shadow" name="user">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Company: {{ user['companyName'] }}</h5>
+                                        <h6 class="card-subtitle">Name: {{ user['firstName'] }} {{ user['lastName'] }}</h6>
+                                        <ul class="list-group list-group-flush">
+                                        {% for k, v in user['scores'].items() %}
+                                            <li class="list-group-item"><b>Category:</b> {{ k }}, <b>Score:</b> {{ v }}</li>
+                                        {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer">
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td>
+                                                    <input id="{{ user['id'] }}-delete" class="btn btn-outline-danger" type="submit" value="Delete"/>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary" href="/results/{{ user['id'] }}" role="button">View Graph</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                       </div>
+                   {% else %}
+                        <div class="user-card card border-secondary shadow">
+                            <h3 class="text-center">No Users</h3>
+                       </div>
+                   {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  frontend:
+    container_name: front_end
+    build: frontend/
+    environment: 
+      BACKEND_URI: backend 
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+  backend:
+    container_name: rest_service
+    build: cnmm/
+    ports:
+      - "9090:9090"
+    links:
+      - mongo
+    depends_on:
+      - mongo
+
+  mongo:
+    container_name: mongo
+    build: MongoDB
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
